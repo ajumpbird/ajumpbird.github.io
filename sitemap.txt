@@ -1,7 +1,9 @@
-https://ajumpbird.github.io/2024/07/06/hello-world/
+https://ajumpbird.github.io/tags/index.html
+https://ajumpbird.github.io/categories/index.html
+https://ajumpbird.github.io/2024/07/07/%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E8%BF%87%E7%A8%8B%E4%B8%AD%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/
+https://ajumpbird.github.io/about/index.html
 https://ajumpbird.github.io/404/index.html
 https://ajumpbird.github.io/schedule/index.html
-https://ajumpbird.github.io/categories/index.html
-https://ajumpbird.github.io/tags/index.html
-https://ajumpbird.github.io/about/index.html
 https://ajumpbird.github.io/
+https://ajumpbird.github.io/tags/%E5%8D%9A%E5%AE%A2/
+https://ajumpbird.github.io/categories/%E6%95%99%E7%A8%8B/
