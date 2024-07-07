@@ -58,6 +58,7 @@ alt="typora" />
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">禁用自动行尾转换</span></span><br><span class="line">git config --global core.autocrlf false</span><br></pre></td></tr></table></figure>
 <p>虽然控制台还是会有这个警告，但是网站能够正常部署。</p>
 <h2 id="本地搜索功能异常">本地搜索功能异常</h2>
+<p>我无法复现这个问题，这个问题是这样的，在本地部署没有问题，但是部署到云端后，在谷歌浏览器中，本地搜索功能出现异常，无法使用，并且不能像本地那样正常显示，在Edge浏览中是正常的。解决方案是将<code>minify</code>设置为<code>false</code>。</p>
 <h2 id="next中的一些功能">next中的一些功能</h2>
 <p>我选用的hexo主题是<span class="exturl" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZy8=">next<i class="fa fa-external-link-alt"></i></span>，这个第三方主题有详细的文档，使用稳定，符合我追求极简的风格，值得推荐。以下是一些不错的功能链接：</p>
 <ol type="1">
