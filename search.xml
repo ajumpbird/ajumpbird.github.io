@@ -57,6 +57,7 @@ alt="typora" />
 网站部署后会出现混乱的情况，参照网上的解决办法，修改Git的配置：</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">禁用自动行尾转换</span></span><br><span class="line">git config --global core.autocrlf false</span><br></pre></td></tr></table></figure>
 <p>虽然控制台还是会有这个警告，但是网站能够正常部署。</p>
+<h2 id="本地搜索功能异常">本地搜索功能异常</h2>
 <h2 id="next中的一些功能">next中的一些功能</h2>
 <p>我选用的hexo主题是<span class="exturl" data-url="aHR0cHM6Ly90aGVtZS1uZXh0LmpzLm9yZy8=">next<i class="fa fa-external-link-alt"></i></span>，这个第三方主题有详细的文档，使用稳定，符合我追求极简的风格，值得推荐。以下是一些不错的功能链接：</p>
 <ol type="1">
