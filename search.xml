@@ -1,6 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>PyTorch数据转换Transforms</title>
+    <url>/2024/07/10/PyTorch%E6%95%B0%E6%8D%AE%E8%BD%AC%E6%8D%A2Transforms/</url>
+    <content><![CDATA[<p>为了更有效地训练模型，往往需要对输入数据进行一些转换，这就需要用到<code>torchvision.transforms</code>。
+<span id="more"></span> 本文参考<span class="exturl" data-url="aHR0cHM6Ly9weXRvcmNoLm9yZy90dXRvcmlhbHMvYmVnaW5uZXIvYmFzaWNzL3RyYW5zZm9ybXNfdHV0b3JpYWwuaHRtbA==">Transforms<i class="fa fa-external-link-alt"></i></span></p>
+<p>本教程用到库如下：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">from</span> torchvision <span class="keyword">import</span> datasets</span><br><span class="line"><span class="keyword">from</span> torchvision.transforms <span class="keyword">import</span> ToTensor, Lambda</span><br></pre></td></tr></table></figure>
+<p>所有的TorchVision
+datasets都用两个参数：<code>transform</code>和<code>target_transform</code>分别用于修改样本和标签，<code>torchvision.transforms</code>提供了几个开箱即用的transforms。</p>
+<p>FashionMNIST的图像是PIL
+Image，标签是整数，我们需要将图像转换为标准化的tensor，将标签转换为one-hot形式的tensor，为了进行这些转换，我们用到<code>ToTensor</code>和<code>Lambda</code>。代码如下：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">ds = datasets.FashionMNIST(</span><br><span class="line">    root=<span class="string">&quot;data&quot;</span>,</span><br><span class="line">    train=<span class="literal">True</span>,</span><br><span class="line">    download=<span class="literal">True</span>,</span><br><span class="line">    <span class="comment"># ToTensor 将 PIL image 或 NumPy ndarray 转换为 FloatTensor</span></span><br><span class="line">    <span class="comment"># 并将像素值转换到 [0,1]</span></span><br><span class="line">    transform=ToTensor(),</span><br><span class="line">    <span class="comment"># 使用 scatter_ 将指定位置的值设为 1</span></span><br><span class="line">    target_transform=Lambda(<span class="keyword">lambda</span> y: torch.zeros(<span class="number">10</span>, dtype=torch.<span class="built_in">float</span>).scatter_(<span class="number">0</span>, torch.tensor(y), value=<span class="number">1</span>))</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>Python</tag>
+        <tag>PyTorch</tag>
+        <tag>深度学习</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>PyTorch 图像分类</title>
     <url>/2024/07/07/PyTorch-%E5%9B%BE%E5%83%8F%E5%88%86%E7%B1%BB/</url>
     <content><![CDATA[<p>本文使用PyTorch实现图像分类。 <span id="more"></span> ## 重要的链接</p>
@@ -15,24 +37,234 @@
         <category>教程</category>
       </categories>
       <tags>
+        <tag>Python</tag>
         <tag>PyTorch</tag>
         <tag>深度学习</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>PyTorch深度学习简单工作流</title>
+    <url>/2024/07/09/PyTorch%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AE%80%E5%8D%95%E5%B7%A5%E4%BD%9C%E6%B5%81/</url>
+    <content><![CDATA[<p>本文记录学习PyTorch的过程，参考的是PyTorch的<span class="exturl" data-url="aHR0cHM6Ly9weXRvcmNoLm9yZy90dXRvcmlhbHMv">官方教程<i class="fa fa-external-link-alt"></i></span>。PyTorch中有太多的类，看得人眼花缭乱，当不太了解一个类的用法时，最好的办法是问ChatGPT，并结合官方文档来看。
+<span id="more"></span></p>
+<h2 id="colab防止断开连接">Colab防止断开连接</h2>
+<p>在浏览器控制台执行下面的代码，这个代码段的作用是定期自动点击 Google
+Colab 界面上的 "连接" 按钮，以保持 Colab 会话活跃，防止会话断开。它通过
+JavaScript 定期执行点击操作。</p>
+<figure class="highlight javascript"><figcaption><span>Colab防断连</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">ClickConnect</span>(<span class="params"></span>)&#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;Working&quot;</span>);</span><br><span class="line">  <span class="variable language_">document</span></span><br><span class="line">    .<span class="title function_">querySelector</span>(<span class="string">&quot;#top-toolbar &gt; colab-connect-button&quot;</span>)</span><br><span class="line">    .<span class="property">shadowRoot</span></span><br><span class="line">    .<span class="title function_">querySelector</span>(<span class="string">&quot;#connect&quot;</span>)</span><br><span class="line">    .<span class="title function_">click</span>()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">setInterval</span>(<span class="title class_">ClickConnect</span>,<span class="number">1</span>*<span class="number">60000</span>)   <span class="comment">//1 分钟点一次</span></span><br></pre></td></tr></table></figure>
+<h2 id="working-with-data">Working with data</h2>
+<p>这是本节需要用到的库：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">from</span> torch <span class="keyword">import</span> nn</span><br><span class="line"><span class="keyword">from</span> torch.utils.data <span class="keyword">import</span> DataLoader</span><br><span class="line"><span class="keyword">from</span> torchvision <span class="keyword">import</span> datasets</span><br><span class="line"><span class="keyword">from</span> torchvision.transforms <span class="keyword">import</span> ToTensor</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br></pre></td></tr></table></figure>
+<p><code>torch.utils.data.DataLoader</code>和<code>torch.utils.data.Dataset</code>是对数据集操作的最基本类，Dateset用于存储样本和它们对应的标签，DataLoader将Dataset包装成可迭代对象。</p>
+<p>PyTorch提供了特定领域的库，比如TorchText，TorchVision和TorchAudio，这些库包含了相应领域最常用的数据集。<code>torchvision.datasets</code>的Dateset包含了两个参数：<code>transform</code>和<code>target_transform</code>分别用于修改样本和标签，更多请参考<a href="/2024/07/10/PyTorch%E6%95%B0%E6%8D%AE%E8%BD%AC%E6%8D%A2Transforms/" title="PyTorch数据转换Transforms">PyTorch数据转换Transforms</a>。下面是下载FashionMNIST数据集：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Download training data from open datasets.</span></span><br><span class="line">training_data = datasets.FashionMNIST(</span><br><span class="line">    root=<span class="string">&quot;data&quot;</span>,</span><br><span class="line">    train=<span class="literal">True</span>,</span><br><span class="line">    download=<span class="literal">True</span>,</span><br><span class="line">    transform=ToTensor(),</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Download test data from open datasets.</span></span><br><span class="line">test_data = datasets.FashionMNIST(</span><br><span class="line">    root=<span class="string">&quot;data&quot;</span>,</span><br><span class="line">    train=<span class="literal">False</span>,</span><br><span class="line">    download=<span class="literal">True</span>,</span><br><span class="line">    transform=ToTensor(),</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>以下代码说明：</p>
+<ol type="1">
+<li><code>training_data</code>属于<code>torchvision.datasets.mnist.FashionMNIST</code>类；</li>
+<li><code>torchvision.datasets.mnist.FashionMNIST</code>又继承自<code>torch.utils.data.dataset.Dataset</code>；</li>
+<li><code>torch.utils.data.dataset.Dataset</code>与<code>torch.utils.data.Dataset</code>是等价的。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 查看training_data属于哪个类：torchvision.datasets.mnist.FashionMNIST</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">type</span>(training_data))</span><br><span class="line"><span class="comment"># 查看torchvision.datasets.mnist.FashionMNIST的继承链</span></span><br><span class="line"><span class="built_in">print</span>(datasets.mnist.FashionMNIST.mro())</span><br></pre></td></tr></table></figure>
+<p>通过以下代码可以查看<code>training_data</code>的属性，可以发现：</p>
+<ol type="1">
+<li><code>training_data.data</code>就是样本数据；</li>
+<li><code>training_data.targets</code>就是对应的标签数据。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="built_in">print</span>(<span class="built_in">vars</span>(training_data))</span><br><span class="line"><span class="comment"># print(training_data.data.shape)</span></span><br><span class="line"><span class="comment"># plt.imshow(training_data.data[10], cmap=&#x27;gray&#x27;)</span></span><br><span class="line"><span class="comment"># plt.show()</span></span><br></pre></td></tr></table></figure>
+<p>以下代码将<code>training_data</code>与<code>test_data</code>包装成可迭代对象：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">batch_size = <span class="number">64</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Create data loaders.</span></span><br><span class="line">train_dataloader = DataLoader(training_data, batch_size=batch_size)</span><br><span class="line">test_dataloader = DataLoader(test_data, batch_size=batch_size)</span><br><span class="line"></span><br><span class="line"><span class="comment"># X是一个batch的样本，y是对应的标签</span></span><br><span class="line"><span class="keyword">for</span> X, y <span class="keyword">in</span> test_dataloader:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;Shape of X [N, C, H, W]: <span class="subst">&#123;X.shape&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;Shape of y: <span class="subst">&#123;y.shape&#125;</span> <span class="subst">&#123;y.dtype&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">    Shape of X [N, C, H, W]: torch.Size([64, 1, 28, 28])</span></span><br><span class="line"><span class="string">    Shape of y: torch.Size([64]) torch.int64</span></span><br><span class="line"><span class="string">    &#x27;&#x27;&#x27;</span></span><br><span class="line">    <span class="keyword">break</span></span><br></pre></td></tr></table></figure>
+<p>想了解更多请参考<a href="/2024/07/10/PyTorch%E8%87%AA%E5%AE%9A%E4%B9%89Dataset/" title="PyTorch自定义Dataset">PyTorch自定义Dataset</a>。</p>
+<h2 id="creating-models">Creating Models</h2>
+<p>为了用PyTorch构建神经网络，我们需要创建一个继承自<code>nn.Module</code>的类，在<code>__init__</code>方法中定义神经网络的各个层，在<code>forward</code>方法中定义数据在这些层中的传递顺序。还可以决定是否运行在GPU中。代码如下：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Get cpu, gpu or mps device for training.</span></span><br><span class="line">device = (</span><br><span class="line">    <span class="string">&quot;cuda&quot;</span></span><br><span class="line">    <span class="keyword">if</span> torch.cuda.is_available()</span><br><span class="line">    <span class="keyword">else</span> <span class="string">&quot;mps&quot;</span></span><br><span class="line">    <span class="keyword">if</span> torch.backends.mps.is_available()</span><br><span class="line">    <span class="keyword">else</span> <span class="string">&quot;cpu&quot;</span></span><br><span class="line">)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;Using <span class="subst">&#123;device&#125;</span> device&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define model</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">NeuralNetwork</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        self.flatten = nn.Flatten()</span><br><span class="line">        self.linear_relu_stack = nn.Sequential(</span><br><span class="line">            nn.Linear(<span class="number">28</span>*<span class="number">28</span>, <span class="number">512</span>),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Linear(<span class="number">512</span>, <span class="number">512</span>),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Linear(<span class="number">512</span>, <span class="number">10</span>)</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        x = self.flatten(x)</span><br><span class="line">        logits = self.linear_relu_stack(x)</span><br><span class="line">        <span class="keyword">return</span> logits</span><br><span class="line"></span><br><span class="line">model = NeuralNetwork().to(device)</span><br><span class="line"><span class="built_in">print</span>(model)</span><br></pre></td></tr></table></figure>
+<h2 id="optimizing-the-model-parameters">Optimizing the Model
+Parameters</h2>
+<p>要训练定义好的模型，我们需要损失函数和优化器，如下代码：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">loss_fn = nn.CrossEntropyLoss()</span><br><span class="line">optimizer = torch.optim.SGD(model.parameters(), lr=<span class="number">1e-3</span>)</span><br></pre></td></tr></table></figure>
+<p>在一个epoch中，模型要做的事是：以一个batch为单位进行循环，对训练集进行预测，反向传播预测误差，调整参数。我们定义下面的训练方法：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">train</span>(<span class="params">dataloader, model, loss_fn, optimizer</span>):</span><br><span class="line">    size = <span class="built_in">len</span>(dataloader.dataset)</span><br><span class="line">    model.train()</span><br><span class="line">    <span class="keyword">for</span> batch, (X, y) <span class="keyword">in</span> <span class="built_in">enumerate</span>(dataloader):</span><br><span class="line">        X, y = X.to(device), y.to(device)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Compute prediction error</span></span><br><span class="line">        pred = model(X)</span><br><span class="line">        loss = loss_fn(pred, y)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Backpropagation</span></span><br><span class="line">        loss.backward()</span><br><span class="line">        optimizer.step()</span><br><span class="line">        optimizer.zero_grad()</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> batch % <span class="number">100</span> == <span class="number">0</span>:</span><br><span class="line">            loss, current = loss.item(), (batch + <span class="number">1</span>) * <span class="built_in">len</span>(X)</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;loss: <span class="subst">&#123;loss:&gt;7f&#125;</span>  [<span class="subst">&#123;current:&gt;5d&#125;</span>/<span class="subst">&#123;size:&gt;5d&#125;</span>]&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>得到训练好的模型后，还需要测试模型，测试和训练是有区别的，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">test</span>(<span class="params">dataloader, model, loss_fn</span>):</span><br><span class="line">    size = <span class="built_in">len</span>(dataloader.dataset)</span><br><span class="line">    num_batches = <span class="built_in">len</span>(dataloader)</span><br><span class="line">    model.<span class="built_in">eval</span>()</span><br><span class="line">    test_loss, correct = <span class="number">0</span>, <span class="number">0</span></span><br><span class="line">    <span class="keyword">with</span> torch.no_grad():</span><br><span class="line">        <span class="keyword">for</span> X, y <span class="keyword">in</span> dataloader:</span><br><span class="line">            X, y = X.to(device), y.to(device)</span><br><span class="line">            pred = model(X)</span><br><span class="line">            test_loss += loss_fn(pred, y).item()</span><br><span class="line">            correct += (pred.argmax(<span class="number">1</span>) == y).<span class="built_in">type</span>(torch.<span class="built_in">float</span>).<span class="built_in">sum</span>().item()</span><br><span class="line">    test_loss /= num_batches</span><br><span class="line">    correct /= size</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;Test Error: \n Accuracy: <span class="subst">&#123;(<span class="number">100</span>*correct):&gt;<span class="number">0.1</span>f&#125;</span>%, Avg loss: <span class="subst">&#123;test_loss:&gt;8f&#125;</span> \n&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>通过以下代码开始训练模型，可以顺便在每个epoch测试模型：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">epochs = <span class="number">5</span></span><br><span class="line"><span class="keyword">for</span> t <span class="keyword">in</span> <span class="built_in">range</span>(epochs):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;Epoch <span class="subst">&#123;t+<span class="number">1</span>&#125;</span>\n-------------------------------&quot;</span>)</span><br><span class="line">    train(train_dataloader, model, loss_fn, optimizer)</span><br><span class="line">    test(test_dataloader, model, loss_fn)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Done!&quot;</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="saving-models">Saving Models</h2>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">torch.save(model.state_dict(), <span class="string">&quot;model.pth&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Saved PyTorch Model State to model.pth&quot;</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="loading-models">Loading Models</h2>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">model = NeuralNetwork().to(device)</span><br><span class="line">model.load_state_dict(torch.load(<span class="string">&quot;model.pth&quot;</span>))</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>Python</tag>
+        <tag>PyTorch</tag>
+        <tag>深度学习</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Python魔术方法</title>
+    <url>/2024/07/10/Python%E9%AD%94%E6%9C%AF%E6%96%B9%E6%B3%95/</url>
+    <content><![CDATA[<p>Python
+类中有许多特殊方法（也称为魔术方法或双下划线方法），它们以双下划线开头和结尾，并为类定义了特殊的行为。
+<span id="more"></span> 以下是一些常见的特殊方法及其用途：</p>
+<div class="note warning"><p>本文由ChatGPT生成!</p>
+</div>
+<h3 id="初始化和表示">初始化和表示</h3>
+<ul>
+<li><code>__init__(self, ...)</code>：初始化方法，在创建对象时调用，用于设置对象的初始状态。</li>
+<li><code>__new__(cls, ...)</code>：在创建对象时调用，返回该对象的一个实例。通常不需要重载。</li>
+<li><code>__del__(self)</code>：析构方法，在对象销毁时调用。很少用。</li>
+</ul>
+<h3 id="字符串表示">字符串表示</h3>
+<ul>
+<li><code>__str__(self)</code>：定义当使用 <code>str()</code> 或
+<code>print()</code> 输出对象时的字符串表示。</li>
+<li><code>__repr__(self)</code>：定义当使用 <code>repr()</code>
+或在交互解释器中直接输入对象时的字符串表示，通常应返回一个有效的 Python
+表达式以重现对象。</li>
+</ul>
+<h3 id="容器类相关方法">容器类相关方法</h3>
+<ul>
+<li><code>__len__(self)</code>：返回对象的长度，通常用于容器类。</li>
+<li><code>__getitem__(self, key)</code>：定义使用 <code>self[key]</code>
+访问元素的行为。</li>
+<li><code>__setitem__(self, key, value)</code>：定义使用
+<code>self[key] = value</code> 设置元素的行为。</li>
+<li><code>__delitem__(self, key)</code>：定义使用
+<code>del self[key]</code> 删除元素的行为。</li>
+<li><code>__iter__(self)</code>：返回一个对象的迭代器，用于迭代对象。</li>
+<li><code>__next__(self)</code>：返回下一个迭代值，通常与
+<code>__iter__()</code> 一起使用。</li>
+</ul>
+<h3 id="算术运算符">算术运算符</h3>
+<ul>
+<li><code>__add__(self, other)</code>：定义加法运算
+(<code>+</code>)。</li>
+<li><code>__sub__(self, other)</code>：定义减法运算
+(<code>-</code>)。</li>
+<li><code>__mul__(self, other)</code>：定义乘法运算
+(<code>*</code>)。</li>
+<li><code>__truediv__(self, other)</code>：定义真除法运算
+(<code>/</code>)。</li>
+<li><code>__floordiv__(self, other)</code>：定义地板除法运算
+(<code>//</code>)。</li>
+<li><code>__mod__(self, other)</code>：定义取模运算
+(<code>%</code>)。</li>
+<li><code>__pow__(self, other)</code>：定义幂运算
+(<code>**</code>)。</li>
+</ul>
+<h3 id="比较运算符">比较运算符</h3>
+<ul>
+<li><code>__eq__(self, other)</code>：定义等于运算
+(<code>==</code>)。</li>
+<li><code>__ne__(self, other)</code>：定义不等于运算
+(<code>!=</code>)。</li>
+<li><code>__lt__(self, other)</code>：定义小于运算
+(<code>&lt;</code>)。</li>
+<li><code>__le__(self, other)</code>：定义小于等于运算
+(<code>&lt;=</code>)。</li>
+<li><code>__gt__(self, other)</code>：定义大于运算
+(<code>&gt;</code>)。</li>
+<li><code>__ge__(self, other)</code>：定义大于等于运算
+(<code>&gt;=</code>)。</li>
+</ul>
+<h3 id="其他常用特殊方法">其他常用特殊方法</h3>
+<ul>
+<li><code>__call__(self, ...)</code>：使对象可以像函数一样被调用。</li>
+<li><code>__enter__(self)</code>：定义进入上下文管理器时的行为，通常与
+<code>__exit__()</code> 一起使用。</li>
+<li><code>__exit__(self, exc_type, exc_value, traceback)</code>：定义退出上下文管理器时的行为，通常与
+<code>__enter__()</code> 一起使用。</li>
+<li><code>__getattr__(self, name)</code>：定义当试图访问一个不存在的属性时的行为。</li>
+<li><code>__setattr__(self, name, value)</code>：定义设置属性的行为。</li>
+<li><code>__delattr__(self, name)</code>：定义删除属性的行为。</li>
+</ul>
+<h3 id="示例代码">示例代码</h3>
+<p>以下是一个包含多个特殊方法的类的示例：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">MyClass</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, value</span>):</span><br><span class="line">        self.value = value</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__str__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="string">f&quot;MyClass with value <span class="subst">&#123;self.value&#125;</span>&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__repr__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="string">f&quot;MyClass(<span class="subst">&#123;self.value&#125;</span>)&quot;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__len__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">len</span>(<span class="built_in">str</span>(self.value))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__getitem__</span>(<span class="params">self, key</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">str</span>(self.value)[key]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__setitem__</span>(<span class="params">self, key, value</span>):</span><br><span class="line">        val_str = <span class="built_in">list</span>(<span class="built_in">str</span>(self.value))</span><br><span class="line">        val_str[key] = value</span><br><span class="line">        self.value = <span class="built_in">int</span>(<span class="string">&quot;&quot;</span>.join(val_str))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__call__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;Called MyClass instance with value <span class="subst">&#123;self.value&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__add__</span>(<span class="params">self, other</span>):</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">isinstance</span>(other, MyClass):</span><br><span class="line">            <span class="keyword">return</span> MyClass(self.value + other.value)</span><br><span class="line">        <span class="keyword">return</span> MyClass(self.value + other)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 示例</span></span><br><span class="line">obj = MyClass(<span class="number">12345</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">str</span>(obj))  <span class="comment"># 使用 __str__</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">repr</span>(obj))  <span class="comment"># 使用 __repr__</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">len</span>(obj))  <span class="comment"># 使用 __len__</span></span><br><span class="line"><span class="built_in">print</span>(obj[<span class="number">2</span>])  <span class="comment"># 使用 __getitem__</span></span><br><span class="line">obj[<span class="number">2</span>] = <span class="string">&#x27;9&#x27;</span>  <span class="comment"># 使用 __setitem__</span></span><br><span class="line"><span class="built_in">print</span>(obj)</span><br><span class="line">obj()  <span class="comment"># 使用 __call__</span></span><br><span class="line">new_obj = obj + MyClass(<span class="number">5</span>)  <span class="comment"># 使用 __add__</span></span><br><span class="line"><span class="built_in">print</span>(new_obj)</span><br></pre></td></tr></table></figure>
+<p>在这个示例中，<code>MyClass</code>
+实现了多个特殊方法，以展示如何使用这些方法来定义类的行为。</p>
+]]></content>
+      <categories>
+        <category>ChatGPT产物</category>
+      </categories>
+      <tags>
         <tag>Python</tag>
       </tags>
   </entry>
   <entry>
-    <title>Pytorch深度学习</title>
-    <url>/2024/07/09/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E6%9C%AF%E8%AF%AD/</url>
-    <content><![CDATA[<p>本文记录学习Pytorch的过程。 <span id="more"></span></p>
-<h2 id="colab防止断开连接">Colab防止断开连接</h2>
-<p>在浏览器控制台执行下面的代码，这段代码的功能是每隔一分钟点击一次，就能防止colab断连。</p>
-<figure class="highlight javascript"><figcaption><span>colab防断连</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">ClickConnect</span>(<span class="params"></span>)&#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;Working&quot;</span>);</span><br><span class="line">  <span class="variable language_">document</span></span><br><span class="line">    .<span class="title function_">querySelector</span>(<span class="string">&quot;#top-toolbar &gt; colab-connect-button&quot;</span>)</span><br><span class="line">    .<span class="property">shadowRoot</span></span><br><span class="line">    .<span class="title function_">querySelector</span>(<span class="string">&quot;#connect&quot;</span>)</span><br><span class="line">    .<span class="title function_">click</span>()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">setInterval</span>(<span class="title class_">ClickConnect</span>,<span class="number">1</span>*<span class="number">60000</span>)   <span class="comment">//1 分钟点一次</span></span><br></pre></td></tr></table></figure>
+    <title>感悟</title>
+    <url>/2024/07/09/%E6%84%9F%E6%82%9F/</url>
+    <content><![CDATA[<p>记录一些个人感悟。 <span id="more"></span></p>
 ]]></content>
+  </entry>
+  <entry>
+    <title>PyTorch自定义Dataset</title>
+    <url>/2024/07/10/PyTorch%E8%87%AA%E5%AE%9A%E4%B9%89Dataset/</url>
+    <content><![CDATA[<p><code>torchvision.datasets</code>可以给我们现成的数据集，为了更好地了解<code>torch.utils.data.Dataset</code>，我们创建一个自定义<code>CustomImageDataset</code>类。
+<span id="more"></span> 参考<span class="exturl" data-url="aHR0cHM6Ly9weXRvcmNoLm9yZy90dXRvcmlhbHMvYmVnaW5uZXIvYmFzaWNzL2RhdGFfdHV0b3JpYWwuaHRtbA==">Datasets
+&amp; DataLoaders<i class="fa fa-external-link-alt"></i></span>。</p>
+<p>本教程需要用到以下库：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">from</span> torch.utils.data <span class="keyword">import</span> Dataset, DataLoader</span><br><span class="line"><span class="keyword">from</span> torchvision <span class="keyword">import</span> datasets</span><br><span class="line"><span class="keyword">from</span> torchvision.transforms <span class="keyword">import</span> ToTensor</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">from</span> torchvision.io <span class="keyword">import</span> read_image</span><br></pre></td></tr></table></figure>
+<h2 id="自定义-customimagedataset-类">自定义 CustomImageDataset 类</h2>
+<p><code>CustomImageDataset</code>需要继承<code>torch.utils.data.Dataset</code>，并且实现三个方法：<code>__init__</code>，<code>__len__</code>和<code>__getitem__</code>：</p>
+<ol type="1">
+<li><code>__init__</code>：初始化数据集，接收图像路径和标签列表；</li>
+<li><code>__len__</code>：是Python的特殊方法之一，它用于返回对象的长度。通常在自定义容器类或数据集类中定义，以便使用内置的<code>len()</code>函数获取对象的长度；</li>
+<li><code>__getitem__</code>：根据给定的索引返回一个图像和对应的标签。</li>
+</ol>
+<div class="note success"><p>Python
+类中有许多特殊方法（也称为魔术方法或双下划线方法），它们以双下划线开头和结尾，并为类定义了特殊的行为。更多请参考<a href="/2024/07/10/Python%E9%AD%94%E6%9C%AF%E6%96%B9%E6%B3%95/" title="Python魔术方法">Python魔术方法</a>。</p>
+</div>
+<p>代码如下：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">CustomImageDataset</span>(<span class="title class_ inherited__">Dataset</span>):</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">    annotations_file 文件类似如下</span></span><br><span class="line"><span class="string">    tshirt1.jpg, 0</span></span><br><span class="line"><span class="string">    tshirt2.jpg, 0</span></span><br><span class="line"><span class="string">    ......</span></span><br><span class="line"><span class="string">    ankleboot999.jpg, 9</span></span><br><span class="line"><span class="string">    &#x27;&#x27;&#x27;</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, annotations_file, img_dir, transform=<span class="literal">None</span>, target_transform=<span class="literal">None</span></span>):</span><br><span class="line">        <span class="comment"># 是一个元组数组</span></span><br><span class="line">        self.img_labels = pd.read_csv(annotations_file)</span><br><span class="line">        <span class="comment"># 图片所在文件夹</span></span><br><span class="line">        self.img_dir = img_dir</span><br><span class="line">        self.transform = transform</span><br><span class="line">        self.target_transform = target_transform</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__len__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">len</span>(self.img_labels)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__getitem__</span>(<span class="params">self, idx</span>):</span><br><span class="line">        <span class="comment"># self.img_labels.iloc[idx, 0] 是图片的文件名</span></span><br><span class="line">        <span class="comment"># iloc 是 pandas 提供的用于按照索引位置访问数据的方法</span></span><br><span class="line">        img_path = os.path.join(self.img_dir, self.img_labels.iloc[idx, <span class="number">0</span>])</span><br><span class="line">        <span class="comment"># 用于将图像转换为 tensor</span></span><br><span class="line">        image = read_image(img_path)</span><br><span class="line">        <span class="comment"># 图像对应的标签</span></span><br><span class="line">        label = self.img_labels.iloc[idx, <span class="number">1</span>]</span><br><span class="line">        <span class="keyword">if</span> self.transform:</span><br><span class="line">            image = self.transform(image)</span><br><span class="line">        <span class="keyword">if</span> self.target_transform:</span><br><span class="line">            label = self.target_transform(label)</span><br><span class="line">        <span class="keyword">return</span> image, label</span><br></pre></td></tr></table></figure>
+<h2 id="通过-dataloader-提取数据">通过 DataLoader 提取数据</h2>
+<p><code>Dataset</code>每次可以提取数据集中的一张图片和标签，然而在训练模型的时候，我们想每次以‘minibatches’的方式提取数据，在每个epoch打乱数据以缓减过拟合，用Python的多线程来加速……，<code>DataLoader</code>将这些过程抽象化为一个可迭代类，提供给我们可用的API。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">train_dataloader = DataLoader(training_data, batch_size=<span class="number">64</span>, shuffle=<span class="literal">True</span>)</span><br><span class="line">test_dataloader = DataLoader(test_data, batch_size=<span class="number">64</span>, shuffle=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Display image and label.</span></span><br><span class="line"><span class="comment"># 每次提取一个 batch_size 的数据</span></span><br><span class="line">train_features, train_labels = <span class="built_in">next</span>(<span class="built_in">iter</span>(train_dataloader))</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;Feature batch shape: <span class="subst">&#123;train_features.size()&#125;</span>&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;Labels batch shape: <span class="subst">&#123;train_labels.size()&#125;</span>&quot;</span>)</span><br><span class="line">img = train_features[<span class="number">0</span>].squeeze()</span><br><span class="line">label = train_labels[<span class="number">0</span>]</span><br><span class="line">plt.imshow(img, cmap=<span class="string">&quot;gray&quot;</span>)</span><br><span class="line">plt.show()</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;Label: <span class="subst">&#123;label&#125;</span>&quot;</span>)</span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">打印结果</span></span><br><span class="line"><span class="string">Feature batch shape: torch.Size([64, 1, 28, 28])</span></span><br><span class="line"><span class="string">Labels batch shape: torch.Size([64])</span></span><br><span class="line"><span class="string">Label: 5</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>Python</tag>
+        <tag>PyTorch</tag>
+        <tag>深度学习</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>英语知识汇总</title>
+    <url>/2024/07/07/%E8%8B%B1%E8%AF%AD%E7%9F%A5%E8%AF%86%E6%B1%87%E6%80%BB/</url>
+    <content><![CDATA[<p>英语是一门重要的语言，为了能无障碍阅读英文文献、看英语视频和理解英语思维，我决定开始认真学习英语。
+<span id="more"></span></p>
+<h2 id="基本句型">基本句型</h2>
+<p>句子成分包括：主语（subject）、谓语动词（predicate
+verb）、宾语（object）、宾语补语（object complement）、主语补语（subject
+complement）、定语（attribute）、状语（adverbial）、同位语（appositive）。</p>
+<p>基本句型包括以下5类：</p>
+<ol type="1">
+<li><p>可以独立完成的动作</p>
+<p>主语 + 不及物动词</p></li>
+<li><p>有1个动作的承受者</p>
+<p>主语 + 单及物动词 + 宾语</p></li>
+<li><p>有2个动作承受者</p>
+<p>主语 + 双及物动词 + 间接宾语 + 直接宾语</p></li>
+<li><p>只有一个动作承受者（但需补充）</p>
+<p>主语 + 复杂及物动词 + 间接宾语 + （宾语）补语</p></li>
+<li><p>非“动作”</p>
+<p>主语 + 系动词 + （主语）补语/表语</p></li>
+</ol>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>英语</tag>
+      </tags>
   </entry>
   <entry>
     <title>搭建博客过程中遇到的问题</title>
     <url>/2024/07/07/%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2%E8%BF%87%E7%A8%8B%E4%B8%AD%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98/</url>
-    <content><![CDATA[<p>第一次尝试用<code>hexo</code>搭建个人博客是2022年的暑假，那时候对前端一窍不通，在搭建的过程中遇到很多问题，然后去学了HTML+css+JavaScript，一发不可收拾，又学了nodejs和vue，对编程有了更多的了解，后来用这些知识找到了人生第一份实习，又学到了更多的知识，人生就是不断的学习、迭代！
+    <content><![CDATA[<p>第一次尝试用<span class="exturl" data-url="aHR0cHM6Ly9oZXhvLmlvL3poLWNuL2RvY3Mv">Hexo<i class="fa fa-external-link-alt"></i></span>搭建个人博客是2022年的暑假，那时候对前端一窍不通，在搭建的过程中遇到很多问题，然后去学了HTML+css+JavaScript，一发不可收拾，又学了nodejs和vue，对编程有了更多的了解，后来用这些知识找到了人生第一份实习，又学到了更多的知识，人生就是不断的学习、迭代！
 <span id="more"></span></p>
 <p>写博客是一件断断续续的事，没有形成习惯与可持续性，今天打算重新拾起，我知道我的博客可能不会有很多读者，但我对成为一个有众多读者的博主已经没有了兴趣，我只想提升自己的写作技巧，把自己学到的东西记录下来，在遗忘后方便自己查询。</p>
 <p>在此记录自己在创作博客过程遇到的一些问题和解决办法。</p>
@@ -88,6 +320,11 @@ alt="typora" />
 <p>虽然控制台还是会有这个警告，但是网站能够正常部署。</p>
 <h2 id="本地搜索功能异常">本地搜索功能异常</h2>
 <p>我无法复现这个问题，这个问题是这样的，在本地部署没有问题，但是部署到云端后，在谷歌浏览器中，本地搜索功能出现异常，无法使用，并且不能像本地那样正常显示，在Edge浏览中是正常的。解决方案是将<code>minify</code>设置为<code>false</code>。</p>
+<h2 id="hexo常用命令">Hexo常用命令</h2>
+<ol type="1">
+<li><code>hexo server</code>启动服务器，如果只修改文章，刷新浏览器就可以看见变动，如果改了配置文件，则需要重启</li>
+<li><code>hexo g -d</code>部署到云端</li>
+</ol>
 <h2
 id="picgo无法自动上传图片到github">PicGo无法自动上传图片到GitHub</h2>
 <p>今天PicGo突然无法自动上传图片到GitHub，日志中出现以下错误：</p>
@@ -113,42 +350,6 @@ Services<i class="fa fa-external-link-alt"></i></span></p>
       </categories>
       <tags>
         <tag>博客</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>感悟</title>
-    <url>/2024/07/09/%E6%84%9F%E6%82%9F/</url>
-    <content><![CDATA[<p>记录一些个人感悟。 <span id="more"></span></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>英语知识汇总</title>
-    <url>/2024/07/07/%E8%8B%B1%E8%AF%AD%E7%9F%A5%E8%AF%86%E6%B1%87%E6%80%BB/</url>
-    <content><![CDATA[<p>英语是一门重要的语言，为了能无障碍阅读英文文献、看英语视频和理解英语思维，我决定开始认真学习英语。
-<span id="more"></span></p>
-<h2 id="基本句型">基本句型</h2>
-<p>句子成分包括：主语（subject）、谓语动词（predicate
-verb）、宾语（object）、宾语补语（object complement）、主语补语（subject
-complement）、定语（attribute）、状语（adverbial）、同位语（appositive）。</p>
-<p>基本句型包括以下5类：</p>
-<ol type="1">
-<li><p>可以独立完成的动作</p>
-<p>主语 + 不及物动词</p></li>
-<li><p>有1个动作的承受者</p>
-<p>主语 + 单及物动词 + 宾语</p></li>
-<li><p>有2个动作承受者</p>
-<p>主语 + 双及物动词 + 间接宾语 + 直接宾语</p></li>
-<li><p>只有一个动作承受者（但需补充）</p>
-<p>主语 + 复杂及物动词 + 间接宾语 + （宾语）补语</p></li>
-<li><p>非“动作”</p>
-<p>主语 + 系动词 + （主语）补语/表语</p></li>
-</ol>
-]]></content>
-      <categories>
-        <category>笔记</category>
-      </categories>
-      <tags>
-        <tag>英语</tag>
       </tags>
   </entry>
   <entry>
@@ -423,6 +624,65 @@ paragraphs</li>
 <li>leisure accounted for the highest proportion</li>
 <li>spent half as much in relative terms</li>
 <li>recreation</li>
+</ul>
+</div>
+<h3 id="table">Table</h3>
+<p>Table中有很多内容，我们需要做的是选择、描述和比较关键的数字，结构仍然是4段式。</p>
+<h4 id="具体实例4">具体实例4</h4>
+<figure>
+<img data-src="https://raw.githubusercontent.com/ajumpbird/myPic/main/Snipaste_2024-07-10_20-08-40.png"
+alt="Snipaste_2024-07-10_20-08-40" />
+<figcaption aria-hidden="true">Snipaste_2024-07-10_20-08-40</figcaption>
+</figure>
+<p>（1）Introduction - paraphrase the question</p>
+<ul>
+<li>（原文）The table below shows statistics about the top five
+countries international tourism in 2012 and 2013.</li>
+<li>The table compares the five highest ranking countries in terms of
+numbers of visits and the money spent by tourists over a period of two
+years.</li>
+</ul>
+<p>（2）Overview - 2 sentences，2 main points</p>
+<ul>
+<li>It is clear that France was the world's most popular tourist
+destination in the years 2012 and 2013. However, the USA earned by far
+the most revenue from tourism over the same period.</li>
+</ul>
+<p>（3）Paragraph 3</p>
+<ul>
+<li>In 2012, 83 million tourists visited France, and the USA was the
+second most visited country, with 66.7 million tourists. Spain and China
+each received just under 58 million visitors, while Italy was ranked
+fifth with 46.4 million tourists. 2013 saw a rise of between 1 and 4
+million tourist（用作形容词） visits to each country, with the exception
+of China, which received 2 million fewer visitors than in previous
+year.</li>
+</ul>
+<p>（4）Paragraph 4</p>
+<ul>
+<li>Spending by tourists visiting the USA increased from $126.2 billion
+in 2012 to $139.6 billion in 2013, and these fogures were well over
+twice as high as those for any other country. Spain received the second
+highest amounts of tourists revenue, rising from $56.3 billion to $60.4
+billion, followed by France, China and Italy. Interestingly, despite
+falling numbers of tourists, Chinese revenue from tourism rose by $1.7
+billion in 2013.</li>
+</ul>
+<div class="note success"><h4 id="good-expressions4">Good expressions4</h4>
+<ul>
+<li>five highest ranking countries</li>
+<li>the world's most popular tourist destination</li>
+<li>earned by far the most</li>
+<li>revenue from tourism</li>
+<li>the second most visited country</li>
+<li>received... visitors</li>
+<li>ranked fifth</li>
+<li>2013 saw a rise of</li>
+<li>fewer visitors than in the previous year</li>
+<li>these figures were well over twice as high as</li>
+<li>amounts of tourist revenue</li>
+<li>despite falling numbers</li>
+<li>saw a rise increased rising from rose by</li>
 </ul>
 </div>
 ]]></content>
