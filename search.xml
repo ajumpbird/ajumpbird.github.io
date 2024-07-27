@@ -23,85 +23,6 @@ Image，标签是整数，我们需要将图像转换为标准化的tensor，将
       </tags>
   </entry>
   <entry>
-    <title>PyTorch 图像分类</title>
-    <url>/2024/07/07/PyTorch-%E5%9B%BE%E5%83%8F%E5%88%86%E7%B1%BB/</url>
-    <content><![CDATA[<p>本文使用PyTorch实现图像分类。 <span id="more"></span> ## 重要的链接</p>
-<ol type="1">
-<li><span class="exturl" data-url="aHR0cHM6Ly9weXRvcmNoLm9yZy8=">PyTorch官网<i class="fa fa-external-link-alt"></i></span></li>
-<li><span class="exturl" data-url="aHR0cHM6Ly9weXRvcmNoLm9yZy90dXRvcmlhbHMv">PyTorch教程<i class="fa fa-external-link-alt"></i></span></li>
-</ol>
-<h2 id="transforms数据转换">Transforms(数据转换)</h2>
-<p>一开始，数据并不符合我们想要的格式，我们需要对数据进行一些处理，<code>TorchVision datasets</code>有两个参数：<code>transform</code>（用于修改特征）和<code>target_transform</code>（用于修改标签），<code>FashionMNIST</code>的特征是<code>PIL Image</code>格式，标签是整数。</p>
-]]></content>
-      <categories>
-        <category>教程</category>
-      </categories>
-      <tags>
-        <tag>Python</tag>
-        <tag>PyTorch</tag>
-        <tag>深度学习</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>PyTorch深度学习简单工作流</title>
-    <url>/2024/07/09/PyTorch%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AE%80%E5%8D%95%E5%B7%A5%E4%BD%9C%E6%B5%81/</url>
-    <content><![CDATA[<p>本文记录学习PyTorch的过程，参考的是PyTorch的<span class="exturl" data-url="aHR0cHM6Ly9weXRvcmNoLm9yZy90dXRvcmlhbHMv">官方教程<i class="fa fa-external-link-alt"></i></span>。PyTorch中有太多的类，看得人眼花缭乱，当不太了解一个类的用法时，最好的办法是问ChatGPT，并结合官方文档来看。
-<span id="more"></span></p>
-<h2 id="colab防止断开连接">Colab防止断开连接</h2>
-<p>在浏览器控制台执行下面的代码，这个代码段的作用是定期自动点击 Google
-Colab 界面上的 "连接" 按钮，以保持 Colab 会话活跃，防止会话断开。它通过
-JavaScript 定期执行点击操作。</p>
-<figure class="highlight javascript"><figcaption><span>Colab防断连</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">ClickConnect</span>(<span class="params"></span>)&#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;Working&quot;</span>);</span><br><span class="line">  <span class="variable language_">document</span></span><br><span class="line">    .<span class="title function_">querySelector</span>(<span class="string">&quot;#top-toolbar &gt; colab-connect-button&quot;</span>)</span><br><span class="line">    .<span class="property">shadowRoot</span></span><br><span class="line">    .<span class="title function_">querySelector</span>(<span class="string">&quot;#connect&quot;</span>)</span><br><span class="line">    .<span class="title function_">click</span>()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">setInterval</span>(<span class="title class_">ClickConnect</span>,<span class="number">1</span>*<span class="number">60000</span>)   <span class="comment">//1 分钟点一次</span></span><br></pre></td></tr></table></figure>
-<h2 id="working-with-data">Working with data</h2>
-<p>这是本节需要用到的库：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">from</span> torch <span class="keyword">import</span> nn</span><br><span class="line"><span class="keyword">from</span> torch.utils.data <span class="keyword">import</span> DataLoader</span><br><span class="line"><span class="keyword">from</span> torchvision <span class="keyword">import</span> datasets</span><br><span class="line"><span class="keyword">from</span> torchvision.transforms <span class="keyword">import</span> ToTensor</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br></pre></td></tr></table></figure>
-<p><code>torch.utils.data.DataLoader</code>和<code>torch.utils.data.Dataset</code>是对数据集操作的最基本类，Dateset用于存储样本和它们对应的标签，DataLoader将Dataset包装成可迭代对象。</p>
-<p>PyTorch提供了特定领域的库，比如TorchText，TorchVision和TorchAudio，这些库包含了相应领域最常用的数据集。<code>torchvision.datasets</code>的Dateset包含了两个参数：<code>transform</code>和<code>target_transform</code>分别用于修改样本和标签，更多请参考<a href="/2024/07/10/PyTorch%E6%95%B0%E6%8D%AE%E8%BD%AC%E6%8D%A2Transforms/" title="PyTorch数据转换Transforms">PyTorch数据转换Transforms</a>。下面是下载FashionMNIST数据集：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Download training data from open datasets.</span></span><br><span class="line">training_data = datasets.FashionMNIST(</span><br><span class="line">    root=<span class="string">&quot;data&quot;</span>,</span><br><span class="line">    train=<span class="literal">True</span>,</span><br><span class="line">    download=<span class="literal">True</span>,</span><br><span class="line">    transform=ToTensor(),</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Download test data from open datasets.</span></span><br><span class="line">test_data = datasets.FashionMNIST(</span><br><span class="line">    root=<span class="string">&quot;data&quot;</span>,</span><br><span class="line">    train=<span class="literal">False</span>,</span><br><span class="line">    download=<span class="literal">True</span>,</span><br><span class="line">    transform=ToTensor(),</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-<p>以下代码说明：</p>
-<ol type="1">
-<li><code>training_data</code>属于<code>torchvision.datasets.mnist.FashionMNIST</code>类；</li>
-<li><code>torchvision.datasets.mnist.FashionMNIST</code>又继承自<code>torch.utils.data.dataset.Dataset</code>；</li>
-<li><code>torch.utils.data.dataset.Dataset</code>与<code>torch.utils.data.Dataset</code>是等价的。</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 查看training_data属于哪个类：torchvision.datasets.mnist.FashionMNIST</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">type</span>(training_data))</span><br><span class="line"><span class="comment"># 查看torchvision.datasets.mnist.FashionMNIST的继承链</span></span><br><span class="line"><span class="built_in">print</span>(datasets.mnist.FashionMNIST.mro())</span><br></pre></td></tr></table></figure>
-<p>通过以下代码可以查看<code>training_data</code>的属性，可以发现：</p>
-<ol type="1">
-<li><code>training_data.data</code>就是样本数据；</li>
-<li><code>training_data.targets</code>就是对应的标签数据。</li>
-</ol>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="built_in">print</span>(<span class="built_in">vars</span>(training_data))</span><br><span class="line"><span class="comment"># print(training_data.data.shape)</span></span><br><span class="line"><span class="comment"># plt.imshow(training_data.data[10], cmap=&#x27;gray&#x27;)</span></span><br><span class="line"><span class="comment"># plt.show()</span></span><br></pre></td></tr></table></figure>
-<p>以下代码将<code>training_data</code>与<code>test_data</code>包装成可迭代对象：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">batch_size = <span class="number">64</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Create data loaders.</span></span><br><span class="line">train_dataloader = DataLoader(training_data, batch_size=batch_size)</span><br><span class="line">test_dataloader = DataLoader(test_data, batch_size=batch_size)</span><br><span class="line"></span><br><span class="line"><span class="comment"># X是一个batch的样本，y是对应的标签</span></span><br><span class="line"><span class="keyword">for</span> X, y <span class="keyword">in</span> test_dataloader:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;Shape of X [N, C, H, W]: <span class="subst">&#123;X.shape&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;Shape of y: <span class="subst">&#123;y.shape&#125;</span> <span class="subst">&#123;y.dtype&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">    Shape of X [N, C, H, W]: torch.Size([64, 1, 28, 28])</span></span><br><span class="line"><span class="string">    Shape of y: torch.Size([64]) torch.int64</span></span><br><span class="line"><span class="string">    &#x27;&#x27;&#x27;</span></span><br><span class="line">    <span class="keyword">break</span></span><br></pre></td></tr></table></figure>
-<p>想了解更多请参考<a href="/2024/07/10/PyTorch%E8%87%AA%E5%AE%9A%E4%B9%89Dataset/" title="PyTorch自定义Dataset">PyTorch自定义Dataset</a>。</p>
-<h2 id="creating-models">Creating Models</h2>
-<p>为了用PyTorch构建神经网络，我们需要创建一个继承自<code>nn.Module</code>的类，在<code>__init__</code>方法中定义神经网络的各个层，在<code>forward</code>方法中定义数据在这些层中的传递顺序。还可以决定是否运行在GPU中。代码如下：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Get cpu, gpu or mps device for training.</span></span><br><span class="line">device = (</span><br><span class="line">    <span class="string">&quot;cuda&quot;</span></span><br><span class="line">    <span class="keyword">if</span> torch.cuda.is_available()</span><br><span class="line">    <span class="keyword">else</span> <span class="string">&quot;mps&quot;</span></span><br><span class="line">    <span class="keyword">if</span> torch.backends.mps.is_available()</span><br><span class="line">    <span class="keyword">else</span> <span class="string">&quot;cpu&quot;</span></span><br><span class="line">)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;Using <span class="subst">&#123;device&#125;</span> device&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define model</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">NeuralNetwork</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        self.flatten = nn.Flatten()</span><br><span class="line">        self.linear_relu_stack = nn.Sequential(</span><br><span class="line">            nn.Linear(<span class="number">28</span>*<span class="number">28</span>, <span class="number">512</span>),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Linear(<span class="number">512</span>, <span class="number">512</span>),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Linear(<span class="number">512</span>, <span class="number">10</span>)</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        x = self.flatten(x)</span><br><span class="line">        logits = self.linear_relu_stack(x)</span><br><span class="line">        <span class="keyword">return</span> logits</span><br><span class="line"></span><br><span class="line">model = NeuralNetwork().to(device)</span><br><span class="line"><span class="built_in">print</span>(model)</span><br></pre></td></tr></table></figure>
-<h2 id="optimizing-the-model-parameters">Optimizing the Model
-Parameters</h2>
-<p>要训练定义好的模型，我们需要损失函数和优化器，如下代码：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">loss_fn = nn.CrossEntropyLoss()</span><br><span class="line">optimizer = torch.optim.SGD(model.parameters(), lr=<span class="number">1e-3</span>)</span><br></pre></td></tr></table></figure>
-<p>在一个epoch中，模型要做的事是：以一个batch为单位进行循环，对训练集进行预测，反向传播预测误差，调整参数。我们定义下面的训练方法：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">train</span>(<span class="params">dataloader, model, loss_fn, optimizer</span>):</span><br><span class="line">    size = <span class="built_in">len</span>(dataloader.dataset)</span><br><span class="line">    model.train()</span><br><span class="line">    <span class="keyword">for</span> batch, (X, y) <span class="keyword">in</span> <span class="built_in">enumerate</span>(dataloader):</span><br><span class="line">        X, y = X.to(device), y.to(device)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Compute prediction error</span></span><br><span class="line">        pred = model(X)</span><br><span class="line">        loss = loss_fn(pred, y)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Backpropagation</span></span><br><span class="line">        loss.backward()</span><br><span class="line">        optimizer.step()</span><br><span class="line">        optimizer.zero_grad()</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> batch % <span class="number">100</span> == <span class="number">0</span>:</span><br><span class="line">            loss, current = loss.item(), (batch + <span class="number">1</span>) * <span class="built_in">len</span>(X)</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;loss: <span class="subst">&#123;loss:&gt;7f&#125;</span>  [<span class="subst">&#123;current:&gt;5d&#125;</span>/<span class="subst">&#123;size:&gt;5d&#125;</span>]&quot;</span>)</span><br></pre></td></tr></table></figure>
-<p>得到训练好的模型后，还需要测试模型，测试和训练是有区别的，代码如下：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">test</span>(<span class="params">dataloader, model, loss_fn</span>):</span><br><span class="line">    size = <span class="built_in">len</span>(dataloader.dataset)</span><br><span class="line">    num_batches = <span class="built_in">len</span>(dataloader)</span><br><span class="line">    model.<span class="built_in">eval</span>()</span><br><span class="line">    test_loss, correct = <span class="number">0</span>, <span class="number">0</span></span><br><span class="line">    <span class="keyword">with</span> torch.no_grad():</span><br><span class="line">        <span class="keyword">for</span> X, y <span class="keyword">in</span> dataloader:</span><br><span class="line">            X, y = X.to(device), y.to(device)</span><br><span class="line">            pred = model(X)</span><br><span class="line">            test_loss += loss_fn(pred, y).item()</span><br><span class="line">            correct += (pred.argmax(<span class="number">1</span>) == y).<span class="built_in">type</span>(torch.<span class="built_in">float</span>).<span class="built_in">sum</span>().item()</span><br><span class="line">    test_loss /= num_batches</span><br><span class="line">    correct /= size</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;Test Error: \n Accuracy: <span class="subst">&#123;(<span class="number">100</span>*correct):&gt;<span class="number">0.1</span>f&#125;</span>%, Avg loss: <span class="subst">&#123;test_loss:&gt;8f&#125;</span> \n&quot;</span>)</span><br></pre></td></tr></table></figure>
-<p>通过以下代码开始训练模型，可以顺便在每个epoch测试模型：</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">epochs = <span class="number">5</span></span><br><span class="line"><span class="keyword">for</span> t <span class="keyword">in</span> <span class="built_in">range</span>(epochs):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;Epoch <span class="subst">&#123;t+<span class="number">1</span>&#125;</span>\n-------------------------------&quot;</span>)</span><br><span class="line">    train(train_dataloader, model, loss_fn, optimizer)</span><br><span class="line">    test(test_dataloader, model, loss_fn)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Done!&quot;</span>)</span><br></pre></td></tr></table></figure>
-<h2 id="saving-models">Saving Models</h2>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">torch.save(model.state_dict(), <span class="string">&quot;model.pth&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Saved PyTorch Model State to model.pth&quot;</span>)</span><br></pre></td></tr></table></figure>
-<h2 id="loading-models">Loading Models</h2>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">model = NeuralNetwork().to(device)</span><br><span class="line">model.load_state_dict(torch.load(<span class="string">&quot;model.pth&quot;</span>))</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>教程</category>
-      </categories>
-      <tags>
-        <tag>Python</tag>
-        <tag>PyTorch</tag>
-        <tag>深度学习</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Python魔术方法</title>
     <url>/2024/07/10/Python%E9%AD%94%E6%9C%AF%E6%96%B9%E6%B3%95/</url>
     <content><![CDATA[<p>Python
@@ -193,9 +114,101 @@ Parameters</h2>
       </tags>
   </entry>
   <entry>
+    <title>PyTorch深度学习简单工作流</title>
+    <url>/2024/07/09/PyTorch%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E7%AE%80%E5%8D%95%E5%B7%A5%E4%BD%9C%E6%B5%81/</url>
+    <content><![CDATA[<p>本文记录学习PyTorch的过程，参考的是PyTorch的<span class="exturl" data-url="aHR0cHM6Ly9weXRvcmNoLm9yZy90dXRvcmlhbHMv">官方教程<i class="fa fa-external-link-alt"></i></span>。PyTorch中有太多的类，看得人眼花缭乱，当不太了解一个类的用法时，最好的办法是问ChatGPT，并结合官方文档来看。
+<span id="more"></span></p>
+<h2 id="colab防止断开连接">Colab防止断开连接</h2>
+<p>在浏览器控制台执行下面的代码，这个代码段的作用是定期自动点击 Google
+Colab 界面上的 "连接" 按钮，以保持 Colab 会话活跃，防止会话断开。它通过
+JavaScript 定期执行点击操作。</p>
+<figure class="highlight javascript"><figcaption><span>Colab防断连</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="title function_">ClickConnect</span>(<span class="params"></span>)&#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;Working&quot;</span>);</span><br><span class="line">  <span class="variable language_">document</span></span><br><span class="line">    .<span class="title function_">querySelector</span>(<span class="string">&quot;#top-toolbar &gt; colab-connect-button&quot;</span>)</span><br><span class="line">    .<span class="property">shadowRoot</span></span><br><span class="line">    .<span class="title function_">querySelector</span>(<span class="string">&quot;#connect&quot;</span>)</span><br><span class="line">    .<span class="title function_">click</span>()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> intervalId = <span class="built_in">setInterval</span>(<span class="title class_">ClickConnect</span>,<span class="number">1</span>*<span class="number">60000</span>)   <span class="comment">//1 分钟点一次</span></span><br></pre></td></tr></table></figure>
+<p>执行代码后如图：</p>
+<figure>
+<img data-src="https://raw.githubusercontent.com/ajumpbird/myPic/main/20240712121856.png"
+alt="20240712121856" />
+<figcaption aria-hidden="true">20240712121856</figcaption>
+</figure>
+<p>红色方框中的数字，就是我们的<code>intervalId</code>，在训练神经网络的时候，执行时间比较长，需要停掉这段代码，就在浏览器控制台执行<code>clearInterval(intervalId)</code>，之后如果想再恢复定时点击功能，在控制台执行<code>intervalId = setInterval(ClickConnect,1*60000)</code>即可。</p>
+<h2 id="working-with-data">Working with data</h2>
+<p>这是本节需要用到的库：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">from</span> torch <span class="keyword">import</span> nn</span><br><span class="line"><span class="keyword">from</span> torch.utils.data <span class="keyword">import</span> DataLoader</span><br><span class="line"><span class="keyword">from</span> torchvision <span class="keyword">import</span> datasets</span><br><span class="line"><span class="keyword">from</span> torchvision.transforms <span class="keyword">import</span> ToTensor</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br></pre></td></tr></table></figure>
+<p><code>torch.utils.data.DataLoader</code>和<code>torch.utils.data.Dataset</code>是对数据集操作的最基本类，Dateset用于存储样本和它们对应的标签，DataLoader将Dataset包装成可迭代对象。</p>
+<p>PyTorch提供了特定领域的库，比如TorchText，TorchVision和TorchAudio，这些库包含了相应领域最常用的数据集。<code>torchvision.datasets</code>的Dateset包含了两个参数：<code>transform</code>和<code>target_transform</code>分别用于修改样本和标签，更多请参考<a href="/2024/07/10/PyTorch%E6%95%B0%E6%8D%AE%E8%BD%AC%E6%8D%A2Transforms/" title="PyTorch数据转换Transforms">PyTorch数据转换Transforms</a>。下面是下载FashionMNIST数据集：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Download training data from open datasets.</span></span><br><span class="line">training_data = datasets.FashionMNIST(</span><br><span class="line">    root=<span class="string">&quot;data&quot;</span>,</span><br><span class="line">    train=<span class="literal">True</span>,</span><br><span class="line">    download=<span class="literal">True</span>,</span><br><span class="line">    transform=ToTensor(),</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Download test data from open datasets.</span></span><br><span class="line">test_data = datasets.FashionMNIST(</span><br><span class="line">    root=<span class="string">&quot;data&quot;</span>,</span><br><span class="line">    train=<span class="literal">False</span>,</span><br><span class="line">    download=<span class="literal">True</span>,</span><br><span class="line">    transform=ToTensor(),</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<p>以下代码说明：</p>
+<ol type="1">
+<li><code>training_data</code>属于<code>torchvision.datasets.mnist.FashionMNIST</code>类；</li>
+<li><code>torchvision.datasets.mnist.FashionMNIST</code>又继承自<code>torch.utils.data.dataset.Dataset</code>；</li>
+<li><code>torch.utils.data.dataset.Dataset</code>与<code>torch.utils.data.Dataset</code>是等价的。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 查看training_data属于哪个类：torchvision.datasets.mnist.FashionMNIST</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">type</span>(training_data))</span><br><span class="line"><span class="comment"># 查看torchvision.datasets.mnist.FashionMNIST的继承链</span></span><br><span class="line"><span class="built_in">print</span>(datasets.mnist.FashionMNIST.mro())</span><br></pre></td></tr></table></figure>
+<p>通过以下代码可以查看<code>training_data</code>的属性，可以发现：</p>
+<ol type="1">
+<li><code>training_data.data</code>就是样本数据；</li>
+<li><code>training_data.targets</code>就是对应的标签数据。</li>
+</ol>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="built_in">print</span>(<span class="built_in">vars</span>(training_data))</span><br><span class="line"><span class="comment"># print(training_data.data.shape)</span></span><br><span class="line"><span class="comment"># plt.imshow(training_data.data[10], cmap=&#x27;gray&#x27;)</span></span><br><span class="line"><span class="comment"># plt.show()</span></span><br></pre></td></tr></table></figure>
+<p>以下代码将<code>training_data</code>与<code>test_data</code>包装成可迭代对象：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">batch_size = <span class="number">64</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Create data loaders.</span></span><br><span class="line">train_dataloader = DataLoader(training_data, batch_size=batch_size)</span><br><span class="line">test_dataloader = DataLoader(test_data, batch_size=batch_size)</span><br><span class="line"></span><br><span class="line"><span class="comment"># X是一个batch的样本，y是对应的标签</span></span><br><span class="line"><span class="keyword">for</span> X, y <span class="keyword">in</span> test_dataloader:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;Shape of X [N, C, H, W]: <span class="subst">&#123;X.shape&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;Shape of y: <span class="subst">&#123;y.shape&#125;</span> <span class="subst">&#123;y.dtype&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">    Shape of X [N, C, H, W]: torch.Size([64, 1, 28, 28])</span></span><br><span class="line"><span class="string">    Shape of y: torch.Size([64]) torch.int64</span></span><br><span class="line"><span class="string">    &#x27;&#x27;&#x27;</span></span><br><span class="line">    <span class="keyword">break</span></span><br></pre></td></tr></table></figure>
+<p>想了解更多请参考<a href="/2024/07/10/PyTorch%E8%87%AA%E5%AE%9A%E4%B9%89Dataset/" title="PyTorch自定义Dataset">PyTorch自定义Dataset</a>。</p>
+<h2 id="creating-models">Creating Models</h2>
+<p>为了用PyTorch构建神经网络，我们需要创建一个继承自<code>nn.Module</code>的类，在<code>__init__</code>方法中定义神经网络的各个层，在<code>forward</code>方法中定义数据在这些层中的传递顺序。还可以决定是否运行在GPU中。代码如下：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Get cpu, gpu or mps device for training.</span></span><br><span class="line">device = (</span><br><span class="line">    <span class="string">&quot;cuda&quot;</span></span><br><span class="line">    <span class="keyword">if</span> torch.cuda.is_available()</span><br><span class="line">    <span class="keyword">else</span> <span class="string">&quot;mps&quot;</span></span><br><span class="line">    <span class="keyword">if</span> torch.backends.mps.is_available()</span><br><span class="line">    <span class="keyword">else</span> <span class="string">&quot;cpu&quot;</span></span><br><span class="line">)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;Using <span class="subst">&#123;device&#125;</span> device&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Define model</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">NeuralNetwork</span>(nn.Module):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="built_in">super</span>().__init__()</span><br><span class="line">        self.flatten = nn.Flatten()</span><br><span class="line">        self.linear_relu_stack = nn.Sequential(</span><br><span class="line">            nn.Linear(<span class="number">28</span>*<span class="number">28</span>, <span class="number">512</span>),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Linear(<span class="number">512</span>, <span class="number">512</span>),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Linear(<span class="number">512</span>, <span class="number">10</span>)</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">forward</span>(<span class="params">self, x</span>):</span><br><span class="line">        x = self.flatten(x)</span><br><span class="line">        logits = self.linear_relu_stack(x)</span><br><span class="line">        <span class="keyword">return</span> logits</span><br><span class="line"></span><br><span class="line">model = NeuralNetwork().to(device)</span><br><span class="line"><span class="built_in">print</span>(model)</span><br></pre></td></tr></table></figure>
+<h2 id="optimizing-the-model-parameters">Optimizing the Model
+Parameters</h2>
+<p>要训练定义好的模型，我们需要损失函数和优化器，如下代码：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">loss_fn = nn.CrossEntropyLoss()</span><br><span class="line">optimizer = torch.optim.SGD(model.parameters(), lr=<span class="number">1e-3</span>)</span><br></pre></td></tr></table></figure>
+<p>在一个epoch中，模型要做的事是：以一个batch为单位进行循环，对训练集进行预测，反向传播预测误差，调整参数。我们定义下面的训练方法：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">train</span>(<span class="params">dataloader, model, loss_fn, optimizer</span>):</span><br><span class="line">    size = <span class="built_in">len</span>(dataloader.dataset)</span><br><span class="line">    model.train()</span><br><span class="line">    <span class="keyword">for</span> batch, (X, y) <span class="keyword">in</span> <span class="built_in">enumerate</span>(dataloader):</span><br><span class="line">        X, y = X.to(device), y.to(device)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Compute prediction error</span></span><br><span class="line">        pred = model(X)</span><br><span class="line">        loss = loss_fn(pred, y)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Backpropagation</span></span><br><span class="line">        loss.backward()</span><br><span class="line">        optimizer.step()</span><br><span class="line">        optimizer.zero_grad()</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> batch % <span class="number">100</span> == <span class="number">0</span>:</span><br><span class="line">            loss, current = loss.item(), (batch + <span class="number">1</span>) * <span class="built_in">len</span>(X)</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;loss: <span class="subst">&#123;loss:&gt;7f&#125;</span>  [<span class="subst">&#123;current:&gt;5d&#125;</span>/<span class="subst">&#123;size:&gt;5d&#125;</span>]&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>得到训练好的模型后，还需要测试模型，测试和训练是有区别的，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">test</span>(<span class="params">dataloader, model, loss_fn</span>):</span><br><span class="line">    size = <span class="built_in">len</span>(dataloader.dataset)</span><br><span class="line">    num_batches = <span class="built_in">len</span>(dataloader)</span><br><span class="line">    model.<span class="built_in">eval</span>()</span><br><span class="line">    test_loss, correct = <span class="number">0</span>, <span class="number">0</span></span><br><span class="line">    <span class="keyword">with</span> torch.no_grad():</span><br><span class="line">        <span class="keyword">for</span> X, y <span class="keyword">in</span> dataloader:</span><br><span class="line">            X, y = X.to(device), y.to(device)</span><br><span class="line">            pred = model(X)</span><br><span class="line">            test_loss += loss_fn(pred, y).item()</span><br><span class="line">            correct += (pred.argmax(<span class="number">1</span>) == y).<span class="built_in">type</span>(torch.<span class="built_in">float</span>).<span class="built_in">sum</span>().item()</span><br><span class="line">    test_loss /= num_batches</span><br><span class="line">    correct /= size</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;Test Error: \n Accuracy: <span class="subst">&#123;(<span class="number">100</span>*correct):&gt;<span class="number">0.1</span>f&#125;</span>%, Avg loss: <span class="subst">&#123;test_loss:&gt;8f&#125;</span> \n&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>通过以下代码开始训练模型，可以顺便在每个epoch测试模型：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">epochs = <span class="number">5</span></span><br><span class="line"><span class="keyword">for</span> t <span class="keyword">in</span> <span class="built_in">range</span>(epochs):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;Epoch <span class="subst">&#123;t+<span class="number">1</span>&#125;</span>\n-------------------------------&quot;</span>)</span><br><span class="line">    train(train_dataloader, model, loss_fn, optimizer)</span><br><span class="line">    test(test_dataloader, model, loss_fn)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Done!&quot;</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="saving-models">Saving Models</h2>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">torch.save(model.state_dict(), <span class="string">&quot;model.pth&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Saved PyTorch Model State to model.pth&quot;</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="loading-models">Loading Models</h2>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">model = NeuralNetwork().to(device)</span><br><span class="line">model.load_state_dict(torch.load(<span class="string">&quot;model.pth&quot;</span>))</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>Python</tag>
+        <tag>PyTorch</tag>
+        <tag>深度学习</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>PyTorch 图像分类</title>
+    <url>/2024/07/07/PyTorch-%E5%9B%BE%E5%83%8F%E5%88%86%E7%B1%BB/</url>
+    <content><![CDATA[<p>本文使用PyTorch实现图像分类。 <span id="more"></span> ## 重要的链接</p>
+<ol type="1">
+<li><span class="exturl" data-url="aHR0cHM6Ly9weXRvcmNoLm9yZy8=">PyTorch官网<i class="fa fa-external-link-alt"></i></span></li>
+<li><span class="exturl" data-url="aHR0cHM6Ly9weXRvcmNoLm9yZy90dXRvcmlhbHMv">PyTorch教程<i class="fa fa-external-link-alt"></i></span></li>
+</ol>
+<h2 id="transforms数据转换">Transforms(数据转换)</h2>
+<p>一开始，数据并不符合我们想要的格式，我们需要对数据进行一些处理，<code>TorchVision datasets</code>有两个参数：<code>transform</code>（用于修改特征）和<code>target_transform</code>（用于修改标签），<code>FashionMNIST</code>的特征是<code>PIL Image</code>格式，标签是整数。</p>
+]]></content>
+      <categories>
+        <category>教程</category>
+      </categories>
+      <tags>
+        <tag>Python</tag>
+        <tag>PyTorch</tag>
+        <tag>深度学习</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>感悟</title>
     <url>/2024/07/09/%E6%84%9F%E6%82%9F/</url>
     <content><![CDATA[<p>记录一些个人感悟。 <span id="more"></span></p>
+<h2 id="section">20240727</h2>
+<p>只有你自己能定义自己，别人不行。</p>
+<h2 id="section-1">20240720</h2>
+<p>学会快速从痛苦中抽离，及时止损，不必缠绵与痛苦的回忆之中，去感受当下，乐观地面对未来，痛苦的回忆像一只大蟒蛇，会缠着你不放，你要做的是远离它。</p>
+<h2 id="section-2">20240718</h2>
+<p>为什么人不能永远保持高效率的状态？在经历一段混乱的时间之后，下定决心改变这种不好的状态，在最初的几天，效率是很高的，但是随着时间的推进，又会回到混乱的状态。我是一个不擅长做计划的人，感觉想学的东西很多，要做的事很多，在混乱的时间里，大多数时候把时间用于刷短视频去了，因为内心感到焦虑，而刷短视频似乎会让人忘记焦虑，这真的是奶头乐。</p>
 ]]></content>
   </entry>
   <entry>
@@ -229,36 +242,6 @@ Parameters</h2>
         <tag>Python</tag>
         <tag>PyTorch</tag>
         <tag>深度学习</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>英语知识汇总</title>
-    <url>/2024/07/07/%E8%8B%B1%E8%AF%AD%E7%9F%A5%E8%AF%86%E6%B1%87%E6%80%BB/</url>
-    <content><![CDATA[<p>英语是一门重要的语言，为了能无障碍阅读英文文献、看英语视频和理解英语思维，我决定开始认真学习英语。
-<span id="more"></span></p>
-<h2 id="基本句型">基本句型</h2>
-<p>句子成分包括：主语（subject）、谓语动词（predicate
-verb）、宾语（object）、宾语补语（object complement）、主语补语（subject
-complement）、定语（attribute）、状语（adverbial）、同位语（appositive）。</p>
-<p>基本句型包括以下5类：</p>
-<ol type="1">
-<li><p>可以独立完成的动作</p>
-<p>主语 + 不及物动词</p></li>
-<li><p>有1个动作的承受者</p>
-<p>主语 + 单及物动词 + 宾语</p></li>
-<li><p>有2个动作承受者</p>
-<p>主语 + 双及物动词 + 间接宾语 + 直接宾语</p></li>
-<li><p>只有一个动作承受者（但需补充）</p>
-<p>主语 + 复杂及物动词 + 间接宾语 + （宾语）补语</p></li>
-<li><p>非“动作”</p>
-<p>主语 + 系动词 + （主语）补语/表语</p></li>
-</ol>
-]]></content>
-      <categories>
-        <category>笔记</category>
-      </categories>
-      <tags>
-        <tag>英语</tag>
       </tags>
   </entry>
   <entry>
@@ -353,20 +336,6 @@ Services<i class="fa fa-external-link-alt"></i></span></p>
       </tags>
   </entry>
   <entry>
-    <title>言论</title>
-    <url>/2024/07/09/%E8%A8%80%E8%AE%BA/</url>
-    <content><![CDATA[<p>记录一些直击灵魂的言论。</p>
-<span id="more"></span>
-<blockquote><p>什么是三观不同： 你敬畏天理，他崇拜权威； 这是世界观不同。
-你站在良知一边，他站在赢者一边； 这是价值观不同。
-你努力是为了理想的生活，他努力是为了做人上人； 这是人生观的不同。</p>
-<p>月亮是那崇高而不可企及的梦想； 六便士是为了生存不得不赚取的卑微收入。
-多少人只是胆怯地抬头看一眼月亮， 又继续低头追逐赖以温饱的六便士？</p>
-<footer><strong>毛姆</strong><cite>《月亮与六便士》</cite></footer></blockquote>
-<p>带入到生活里，就是你喜欢吃小吃摊，他喜欢吃高档餐厅，这没什么关系，只是喜好不同，但是如果你觉得他吃高档餐厅是假清高，他觉得你吃小吃餐厅不卫生丢面子，这才是真正的三观不同。</p>
-]]></content>
-  </entry>
-  <entry>
     <title>跟着Simon学写作</title>
     <url>/2024/07/08/%E8%B7%9F%E7%9D%80Simon%E5%AD%A6%E5%86%99%E4%BD%9C/</url>
     <content><![CDATA[<p>我想通过写作来累积词汇量，这应该比单纯地记单词更有用，因为我遇见的单词都是更常用的，学以致用的效率应该是最高的。
@@ -378,8 +347,9 @@ Services<i class="fa fa-external-link-alt"></i></span></p>
 <li>Bar graph</li>
 <li>Pie chart</li>
 <li>Table</li>
-<li>Diagram - comparing</li>
-<li>Diagram - process</li>
+<li>Two different charts</li>
+<li>Process diagram</li>
+<li>Comparison diagram</li>
 </ol>
 <p>前面4种类型是相似的，核心是<strong>数字</strong>，应对这4种类型需要做3件事：describe、compare和changes/trends。第五种类型和前4种是相似的，只是不再有数字。第6种类型与前5种都不太相同，需要描述items和structure。</p>
 <p>文章结构分为4段：</p>
@@ -685,6 +655,308 @@ billion in 2013.</li>
 <li>saw a rise increased rising from rose by</li>
 </ul>
 </div>
+<h3 id="two-different-charts">two different charts</h3>
+<p>第5种类型的问题是将两种不同的图表放在一起，你不能在它们之间进行比较，而是分别描述，如下图：</p>
+<figure>
+<img data-src="https://raw.githubusercontent.com/ajumpbird/myPic/main/Snipaste_2024-07-16_19-08-17.png"
+alt="Snipaste_2024-07-16_19-08-17" />
+<figcaption aria-hidden="true">Snipaste_2024-07-16_19-08-17</figcaption>
+</figure>
+<figure>
+<img data-src="https://raw.githubusercontent.com/ajumpbird/myPic/main/Snipaste_2024-07-16_19-10-00.png"
+alt="Snipaste_2024-07-16_19-10-00" />
+<figcaption aria-hidden="true">Snipaste_2024-07-16_19-10-00</figcaption>
+</figure>
+<figure>
+<img data-src="https://raw.githubusercontent.com/ajumpbird/myPic/main/Snipaste_2024-07-16_19-14-16.png"
+alt="Snipaste_2024-07-16_19-14-16" />
+<figcaption aria-hidden="true">Snipaste_2024-07-16_19-14-16</figcaption>
+</figure>
+<p>文章思路如下：</p>
+<ol type="1">
+<li><p>First, look for one main feature in <mark class="label primary">each</mark> chart(summary /
+overview paragraph).</p></li>
+<li><p>Second, describe specific numbers for each chart
+spearately.('details' paragraph)</p></li>
+</ol>
+<h4 id="具体实例5">具体实例5</h4>
+<figure>
+<img data-src="https://raw.githubusercontent.com/ajumpbird/myPic/main/Snipaste_2024-07-16_20-45-37.png"
+alt="Snipaste_2024-07-16_20-45-37" />
+<figcaption aria-hidden="true">Snipaste_2024-07-16_20-45-37</figcaption>
+</figure>
+<p>文章还是4段：</p>
+<p>（1）Introduction - paraphrase the question</p>
+<ul>
+<li>（原文）The bar chart below shows the numbers of men and women
+attending various evening courses at an adult education centre in the
+year 2009. The pie chart gives information about the ages of these
+course participants.</li>
+<li>The bar chart compares the numbers of males and females who took
+four different evening classes in 2009, and the pie chart shows the age
+profile of these attendees.</li>
+</ul>
+<p>（2）Overview - 2 sentences，2 main points（不给出具体数字）</p>
+<ul>
+<li>It is clear that significantly more women than men attended evening
+classes at the education centre. We can also see that evening courses
+were much more popular among older adults.</li>
+</ul>
+<p>（3）Paragraph 3</p>
+<ul>
+<li>According to the bar chart, drama, painting and language courses all
+attracted more women than men to the education centre in 2009. Language
+classes had the highest number of participants overall, with 40 female
+and 20 male students, while painting was a popular choice among both
+genders, attracting 30 female and 25 male attendees. The only course
+with a higher number of males was sculpture, but this course was taken
+by a mere 15 people in total.</li>
+</ul>
+<p>（4）Paragraph 4</p>
+<ul>
+<li>Looking at the age profile pie chart, we can see that the majority
+of people attending evening lessons were over 40 years of age. To be
+precise, 42% of them were aged 50 or more, and 26% were aged between 40
+and 49. Younger adults were in the minority, with only 11% of students
+aged 20 to 29, and only 5% aged under 20.</li>
+</ul>
+<div class="note success"><h4 id="good-expression5">Good expression5</h4>
+<ul>
+<li>attending courses, who took classes</li>
+<li>participants, attendees, students</li>
+<li>males and females</li>
+<li>courses attracted more women</li>
+<li>a popular choice among both genders</li>
+<li>significantly more, higher, highest</li>
+<li>had the highest number, with(+ number)</li>
+<li>was taken by a mere 15 people</li>
+<li>According to the bar chart</li>
+<li>Looking at the age profile pie chart</li>
+<li>the majority of peple</li>
+<li>were in the minority</li>
+<li>To be precise</li>
+</ul>
+</div>
+<h3 id="process-diagram">Process diagram</h3>
+<p>Describe a process is completely different from describing a graph,
+bar chart, pie chart or
+table.流程图与之前的5种图表都不太相似，以下是不同之处：</p>
+<ol type="1">
+<li>no numbers</li>
+<li>can't compare anything</li>
+<li>can't describe trends(increase, decrease)</li>
+</ol>
+<p>我们应该对流程图进行如下描述：</p>
+<ol type="1">
+<li>how many steps</li>
+<li>where the process begins and ends</li>
+<li>each step in the process</li>
+</ol>
+<p>Language for process description:</p>
+<ol type="1">
+<li>'step' language
+<ul>
+<li>At the first stage in the process</li>
+<li>The process begins with</li>
+<li>Secondly, Finally</li>
+<li>The second step involves</li>
+<li>Next, then, after that</li>
+<li>At the following stage</li>
+</ul></li>
+<li>passive verbs</li>
+</ol>
+<p>注意：maps can also show processes</p>
+<h4 id="具体实例6">具体实例6</h4>
+<figure>
+<img data-src="https://raw.githubusercontent.com/ajumpbird/myPic/main/Snipaste_2024-07-17_16-52-46.png"
+alt="Snipaste_2024-07-17_16-52-46" />
+<figcaption aria-hidden="true">Snipaste_2024-07-17_16-52-46</figcaption>
+</figure>
+<p>（1）Intorduction - paraphrase the question</p>
+<ul>
+<li>（原文）The diagrams below show how glass containers, such as
+bottles, are produced and recycled.</li>
+<li>Thr first flow diagram illustrates the process of glass container
+production, and the second diagram shows steps in the process of
+recycling used glass.</li>
+</ul>
+<p>（2）Overview - 2 sentences，2 main points</p>
+<ul>
+<li>We can see that glass is made using three main raw materials, and
+that the manufacturing process consists of four distinct stages. It
+requires five steps to turn used glass into new glass products.</li>
+</ul>
+<p>（3）Paragraph 3</p>
+<ul>
+<li>At the first stage in the production of glass, sand, soda ash,
+limestone and other chemicals are mixed together. Next, this mixture is
+heated in a glass furnace at approximately <span
+class="math inline">\(1500^\circ\mathrm{C}\)</span> to produce molten
+glass. The molten glass can then be shaped, by blowing, to create the
+end products, namely glass containers.</li>
+</ul>
+<p>（4）Paragraph 4</p>
+<ul>
+<li>Glass recycling begins with the collection of used glass products.
+The collected glass is sorted according to its colour, and then washed
+in order to remove any impurities. At the fourth stage of recycling, the
+glass is crushed and melted, and the resulting molten glass can finally
+be moulded to create new items.</li>
+</ul>
+<div class="note success"><h4 id="good-expression">Good expression</h4>
+<ul>
+<li>steps / stages in the process of</li>
+<li>consists of four distinct stages</li>
+<li>raw materials, end products</li>
+<li>production, manufacturing</li>
+<li>turn used glass into new products</li>
+<li>at the first stage, next, then, begins with</li>
+<li>are mixed, is heated, can be shaped</li>
+<li>is sorted according to</li>
+<li>can be moulded to created</li>
+<li>are mixed -&gt; this mixture</li>
+<li>collection -&gt; the collected glass</li>
+<li>is melted -&gt; the resulting molten glass</li>
+</ul>
+</div>
+<h3 id="comparison-diagram">Comparison diagram</h3>
+<p>Comparison diagrams show:</p>
+<ul>
+<li>changes to something e.g. an old design compared to a new
+design</li>
+<li>or two alternative designs</li>
+<li>or even two alternative locations on a map</li>
+</ul>
+<p>我们的任务是比较图表：</p>
+<ul>
+<li>Describe the changes</li>
+<li>Describe things that don't change</li>
+<li>Describe the differences</li>
+<li>Describe the similarities</li>
+</ul>
+<p>需要注意时态。</p>
+<h4 id="具体实例7">具体实例7</h4>
+<figure>
+<img data-src="https://raw.githubusercontent.com/ajumpbird/myPic/main/Snipaste_2024-07-17_18-15-20.png"
+alt="Snipaste_2024-07-17_18-15-20" />
+<figcaption aria-hidden="true">Snipaste_2024-07-17_18-15-20</figcaption>
+</figure>
+<p>这是一个关于now和future的问题。</p>
+<p>（1）Introduction - paraphrase the question</p>
+<ul>
+<li>（原文）The diagrams below show the existing ground floor plan of a
+house and a proposed plan for some building work.</li>
+<li>The two pictures compare the current layout of the ground floor of a
+house with a plan to redesign the same living space.</li>
+</ul>
+<p>（2）Overview - 2 sentences，2 main points</p>
+<ul>
+<li>We can see that the new design proposal involves making a number of
+changes to the ground floor of the house, mainly in the central hall
+area. There are no plans to change external walls or entrances.</li>
+</ul>
+<p>（3）Paragraph 3</p>
+<ul>
+<li>The most noticeable change from the existing to the proposed floor
+plan is that there will no longer be a separate hall area when the
+building work has been done. This will be achieved by removing the
+internal wall and door between the hall and living room, along with the
+current staircase and understair storage cupboard. With no separate hall
+area, the proposed living room will also contain the staircase to the
+first floor.</li>
+</ul>
+<p>（4）Paragraph 4</p>
+<ul>
+<li>To replace the current straight staircase, a new set of winding
+stairs will be installed in the corner of the living room. The internal
+door between the hall and kitchen will also be replaced with double
+doors connecting the kitchen with the new living room. Finally, the
+planned building work will also include the installation of some kitchen
+furniture.</li>
+</ul>
+<div class="note success"><h4 id="good-expression7">Good expression7</h4>
+<ul>
+<li>existing plan -&gt; current layout</li>
+<li>proposed plan -&gt; plan to redesign</li>
+<li>design proposal, planned building work</li>
+<li>there will no longer be</li>
+<li>this will be achieved by removing</li>
+<li>will also contain, will also include</li>
+<li>will be installed, will be replaced</li>
+<li>the design proposal involves</li>
+<li>when the building work has been done</li>
+<li>living space, central hall area, staircase</li>
+<li>under-stair storage cupboard</li>
+<li>a new set of winding stairs</li>
+<li>the installation of some kitchen furniture</li>
+</ul>
+</div>
+<h2 id="ielts-writing-task-2">IELTS writing task 2</h2>
+<p>4个评分标准：</p>
+<ol type="1">
+<li>Task response</li>
+<li>Coherence and cohesion</li>
+<li>Vocabulary</li>
+<li>Grammar</li>
+</ol>
+<p>将任务分成几个部分：</p>
+<ol type="1">
+<li>250 words</li>
+<li>4 paragraphs</li>
+<li>about 13 sentences(introduction 2, two main paragraphs 5 each,
+conclusion 1)</li>
+</ol>
+<p>4种类型的问题：</p>
+<ol type="1">
+<li>Discussion</li>
+<li>Opinion</li>
+<li>Problem and solution</li>
+<li>Two-part question</li>
+</ol>
+]]></content>
+  </entry>
+  <entry>
+    <title>英语知识汇总</title>
+    <url>/2024/07/07/%E8%8B%B1%E8%AF%AD%E7%9F%A5%E8%AF%86%E6%B1%87%E6%80%BB/</url>
+    <content><![CDATA[<p>英语是一门重要的语言，为了能无障碍阅读英文文献、看英语视频和理解英语思维，我决定开始认真学习英语。
+<span id="more"></span></p>
+<h2 id="基本句型">基本句型</h2>
+<p>句子成分包括：主语（subject）、谓语动词（predicate
+verb）、宾语（object）、宾语补语（object complement）、主语补语（subject
+complement）、定语（attribute）、状语（adverbial）、同位语（appositive）。</p>
+<p>基本句型包括以下5类：</p>
+<ol type="1">
+<li><p>可以独立完成的动作</p>
+<p>主语 + 不及物动词</p></li>
+<li><p>有1个动作的承受者</p>
+<p>主语 + 单及物动词 + 宾语</p></li>
+<li><p>有2个动作承受者</p>
+<p>主语 + 双及物动词 + 间接宾语 + 直接宾语</p></li>
+<li><p>只有一个动作承受者（但需补充）</p>
+<p>主语 + 复杂及物动词 + 间接宾语 + （宾语）补语</p></li>
+<li><p>非“动作”</p>
+<p>主语 + 系动词 + （主语）补语/表语</p></li>
+</ol>
+]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>英语</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>言论</title>
+    <url>/2024/07/09/%E8%A8%80%E8%AE%BA/</url>
+    <content><![CDATA[<p>记录一些直击灵魂的言论。</p>
+<span id="more"></span>
+<blockquote><p>什么是三观不同： 你敬畏天理，他崇拜权威； 这是世界观不同。
+你站在良知一边，他站在赢者一边； 这是价值观不同。
+你努力是为了理想的生活，他努力是为了做人上人； 这是人生观的不同。</p>
+<p>月亮是那崇高而不可企及的梦想； 六便士是为了生存不得不赚取的卑微收入。
+多少人只是胆怯地抬头看一眼月亮， 又继续低头追逐赖以温饱的六便士？</p>
+<footer><strong>毛姆</strong><cite>《月亮与六便士》</cite></footer></blockquote>
+<p>带入到生活里，就是你喜欢吃小吃摊，他喜欢吃高档餐厅，这没什么关系，只是喜好不同，但是如果你觉得他吃高档餐厅是假清高，他觉得你吃小吃餐厅不卫生丢面子，这才是真正的三观不同。</p>
 ]]></content>
   </entry>
 </search>
