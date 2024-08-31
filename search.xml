@@ -969,4 +969,62 @@ complement）、定语（attribute）、状语（adverbial）、同位语（appo
 <p>投资者能否取得优异的投资成果，这取决于你在投资方面付出的努力和拥有的知识，也取决于在你的投资生涯中股市的愚蠢程度有多大。股市的行为约愚蠢，有条不紊的投资者成功的机会越大。遵从格雷厄姆的建议，你就能从股市的愚蠢行为中获利，而不会成为愚蠢行为的参与者。</p>
 ]]></content>
   </entry>
+  <entry>
+    <title>为两个GitHub账号设置ssh</title>
+    <url>/2024/08/31/%E4%B8%BA%E4%B8%A4%E4%B8%AAGitHub%E8%B4%A6%E5%8F%B7%E8%AE%BE%E7%BD%AEssh/</url>
+    <content><![CDATA[<p>本文由chatgpt生成。 <span id="more"></span>
+要为两个GitHub账号设置SSH密钥，你需要为每个账号生成并使用不同的SSH密钥对。以下是详细的步骤：</p>
+<h3 id="生成第一个账号的ssh密钥对">1. 生成第一个账号的SSH密钥对</h3>
+<ol type="1">
+<li><p>打开终端（Terminal）。</p></li>
+<li><p>使用以下命令生成第一个SSH密钥对：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh-keygen -t rsa -C <span class="string">&quot;your_email@example.com&quot;</span></span><br></pre></td></tr></table></figure>
+<p>这里的<code>your_email@example.com</code>替换为第一个GitHub账号的邮箱地址。</p></li>
+<li><p>在提示时，保存密钥文件（例如：<code>~/.ssh/id_rsa_github1</code>）。你也可以按Enter键使用默认位置。</p></li>
+<li><p>输入并确认密码短语（如果需要）。</p></li>
+</ol>
+<h3 id="生成第二个账号的ssh密钥对">2. 生成第二个账号的SSH密钥对</h3>
+<ol type="1">
+<li><p>使用以下命令生成第二个SSH密钥对：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh-keygen -t rsa -C <span class="string">&quot;your_other_email@example.com&quot;</span></span><br></pre></td></tr></table></figure>
+<p>这里的<code>your_other_email@example.com</code>替换为第二个GitHub账号的邮箱地址。</p></li>
+<li><p>在提示时，保存密钥文件为另一个文件名（例如：<code>~/.ssh/id_rsa_github2</code>）。</p></li>
+<li><p>输入并确认密码短语（如果需要）。</p></li>
+</ol>
+<h3 id="添加ssh密钥到ssh-agent">3. 添加SSH密钥到ssh-agent</h3>
+<ol type="1">
+<li><p>启动<code>ssh-agent</code>:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">eval</span> <span class="string">&quot;<span class="subst">$(ssh-agent -s)</span>&quot;</span></span><br></pre></td></tr></table></figure></li>
+<li><p>添加第一个SSH密钥到<code>ssh-agent</code>：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh-add ~/.ssh/id_rsa_github1</span><br></pre></td></tr></table></figure></li>
+<li><p>添加第二个SSH密钥到<code>ssh-agent</code>：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ssh-add ~/.ssh/id_rsa_github2</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h3 id="配置.sshconfig文件">4. 配置<code>~/.ssh/config</code>文件</h3>
+<p>编辑<code>~/.ssh/config</code>文件（如果文件不存在，可以创建一个），添加以下内容：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Default GitHub account</span></span><br><span class="line">Host github.com</span><br><span class="line">  HostName github.com</span><br><span class="line">  User git</span><br><span class="line">  IdentityFile ~/.ssh/id_rsa_github1</span><br><span class="line"></span><br><span class="line"><span class="comment"># Second GitHub account</span></span><br><span class="line">Host github-second</span><br><span class="line">  HostName github.com</span><br><span class="line">  User git</span><br><span class="line">  IdentityFile ~/.ssh/id_rsa_github2</span><br></pre></td></tr></table></figure>
+<p>在这个配置中：</p>
+<ul>
+<li><code>github.com</code>使用的是第一个GitHub账号。</li>
+<li><code>github-second</code>是为第二个GitHub账号指定的主机名。</li>
+</ul>
+<h3 id="将ssh公钥添加到github账号">5. 将SSH公钥添加到GitHub账号</h3>
+<ol type="1">
+<li><p>复制第一个账号的SSH公钥：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cat</span> ~/.ssh/id_rsa_github1.pub</span><br></pre></td></tr></table></figure>
+<p>然后将输出的内容复制到第一个GitHub账号的SSH密钥设置中。</p></li>
+<li><p>复制第二个账号的SSH公钥：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cat</span> ~/.ssh/id_rsa_github2.pub</span><br></pre></td></tr></table></figure>
+<p>然后将输出的内容复制到第二个GitHub账号的SSH密钥设置中。</p></li>
+</ol>
+<h3 id="使用ssh克隆仓库">6. 使用SSH克隆仓库</h3>
+<ul>
+<li><p>对于第一个GitHub账号，可以直接使用标准的GitHub地址：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git@github.com:username/repository.git</span><br></pre></td></tr></table></figure></li>
+<li><p>对于第二个GitHub账号，使用在<code>~/.ssh/config</code>中配置的<code>Host</code>：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> git@github-second:username/repository.git</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>通过这些步骤，你可以在同一台机器上为两个GitHub账号设置并使用SSH。</p>
+]]></content>
+  </entry>
 </search>
